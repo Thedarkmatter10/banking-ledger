@@ -13,7 +13,8 @@ This project is a modular, event-sourced ledger service using:
 ## 🧠 Architecture
 
 ### High-Level Flow
-![banking-ledger-flow](https://github.com/user-attachments/assets/1e305ddb-e0b0-44fb-ab04-ac6cd7ce9c64)
+![banking-ledger-flow](assets/<img width="1440" height="1488" alt="architecture" src="https://github.com/user-attachments/assets/5cda5348-652a-4bfc-bd66-5b1971964ebf" />
+)
 
 
 
@@ -69,3 +70,8 @@ CREATE TABLE events (
   payload JSONB,
   timestamp TIMESTAMP
 );
+```
+## ❌ Limitations
+Due to hardware constraints:
+- I did not run Kafka/Redis/PostgreSQL locally
+- Instead, I focused on writing clean, testable components
