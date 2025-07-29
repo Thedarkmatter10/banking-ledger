@@ -13,43 +13,7 @@ This project is a modular, event-sourced ledger service using:
 ## 🧠 Architecture
 
 ### High-Level Flow
-
-             +-----------------+        Write Model (Commands)     +---------------------+
-             |                 | --------------------------------> |                     |
-  Client --->| Command REST API|                                   |  Command Handler     |
-             |                 | <-------------------------------- |                     |
-             +-----------------+       Response                    +---------------------+
-                       |                          |
-                       | Account Exists Middleware|
-                       v                          v
-                 +----------------+          +---------------+
-                 | Input Validator|          | Event Store   | (PostgreSQL)
-                 +----------------+          +---------------+
-                                                   |
-                                                   | Publish to
-                                                   v
-                                              +----------+
-                                              | Kafka     |
-                                              +----------+
-                                                   |
-                                                   v
-                                          +------------------+
-                                          | Kafka Consumer   |
-                                          +------------------+
-                                                   |
-                                                   v
-                                          +---------------------+
-                                          | Redis Read Model    |
-                                          +---------------------+
-                                                   ^
-                                                   |
-                                             +-----------+
-                                             | Query API |
-                                             +-----------+
-                                                   ^
-                                                   |
-                                                Client
-
+![banking-ledger-flow](https://github.com/user-attachments/assets/1e305ddb-e0b0-44fb-ab04-ac6cd7ce9c64)
 
 
 
@@ -65,24 +29,6 @@ Handles incoming requests:
 ### 🔎 Query Responsibility
 
 Serves client queries (e.g., balance/history) using fast Redis-based views.
-
----
-
-## 🧩 Folder Structure
-
-/github.com/Thedarkmatter10/ledger-service
-│
-├── command/ → Command handlers (CreateAccount, Deposit, Withdraw)
-├── query/ → Query handlers (Balance, History)
-├── event/ → Kafka producer + consumer
-├── model/ → Domain models and event struct
-├── repository/ → PostgreSQL event store access
-├── cache/ → Redis wrapper
-├── middleware/ → Reusable middlewares like AccountExistence check
-├── routes/ → Modular route grouping (command/query)
-├── projection/ → Event processors to build read models in Redis
-├── main.go → Entry point
-
 
 ---
 
