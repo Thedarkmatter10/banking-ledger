@@ -17,7 +17,7 @@ func ProcessEvent(event model.Event) {
 		var payload model.TransactionPayload
 		err := json.Unmarshal([]byte(event.Payload), &payload)
 		if err != nil {
-			log.Println("Error unmarshalling:", err)
+			log.Println("Error unmarshalling transaction payload:", err)
 			return
 		}
 
@@ -28,6 +28,22 @@ func ProcessEvent(event model.Event) {
 
 		key := "balance:" + payload.AccountID
 		cache.RDB.IncrBy(ctx, key, delta)
+
+	case "AccountCreated":
+		var payload model.AccountCreatedPayload
+		err := json.Unmarshal([]byte(event.Payload), &payload)
+		if err != nil {
+			log.Println("Error unmarshalling account payload:", err)
+			return
+		}
+
+		// Set initial balance = 0 in Redis
+		key := "balance:" + payload.AccountID
+		err = cache.RDB.Set(ctx, key, 0, 0).Err()
+		if err != nil {
+			log.Println("Error setting initial balance in Redis:", err)
+			return
+		}
 	default:
 		log.Println("Unknown event type:", event.Type)
 	}

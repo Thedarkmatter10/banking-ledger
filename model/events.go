@@ -14,3 +14,8 @@ type TransactionPayload struct {
 	AccountID string `json:"account_id"`
 	Amount    int64  `json:"amount"`
 }
+
+type AccountCreatedPayload struct {
+	AccountID string `json:"account_id"`
+	UserName  string `json:"user_name"`
+}

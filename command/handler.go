@@ -15,14 +15,36 @@ import (
 	"github.com/google/uuid"
 )
 
+type CreateAccountRequest struct {
+	UserName string `json:"user_name" binding:"required"`
+}
+
 func CreateAccount(c *gin.Context) {
+	var req CreateAccountRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_name is required"})
+		return
+	}
+
 	accountID := uuid.New().String()
 
+	// Create payload
+	payload := model.AccountCreatedPayload{
+		AccountID: accountID,
+		UserName:  req.UserName,
+	}
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to encode payload"})
+		return
+	}
+
+	// Create event
 	event := model.Event{
 		ID:          uuid.New().String(),
 		AggregateID: accountID,
 		Type:        "AccountCreated",
-		Payload:     "{}",
+		Payload:     string(payloadBytes),
 		Timestamp:   time.Now(),
 	}
 
@@ -31,7 +53,10 @@ func CreateAccount(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"account_id": accountID})
+	c.JSON(http.StatusOK, gin.H{
+		"account_id": accountID,
+		"user_name":  req.UserName,
+	})
 }
 
 func HandleDeposit(c *gin.Context) {
